@@ -25,20 +25,25 @@
     .apple::before { content: ""; position: absolute; z-index: -1; left: calc(50% - 3px); top: -7px; width: 7px; height: 23px; border-radius: 5px; background: linear-gradient(90deg, #4a2810, #95613a 50%, #3c210d); transform: rotate(8deg) scaleY(var(--twig-scale)); transform-origin: top; }
     .apple.dragging { z-index: 18; cursor: grabbing; transition: none; filter: drop-shadow(0 11px 8px #0007) saturate(1.08); }
     .apple.tease { animation: apple-tease .35s ease; }
-    .apple.picked { pointer-events: none; animation: apple-to-basket .78s cubic-bezier(.48,.05,.78,.48) forwards; }
+    .apple.picked { z-index: 42; pointer-events: none; animation: apple-to-basket .82s cubic-bezier(.36,.04,.72,.52) forwards; }
+    .apple.stored { visibility: hidden; animation: none; }
     @keyframes apple-tease { 30% { rotate: -7deg; } 65% { rotate: 8deg; } }
     @keyframes apple-to-basket {
       0% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(var(--s)) rotate(var(--rot)); opacity: 1; }
       18% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) - 18px)) scale(calc(var(--s) * .97)) rotate(18deg); opacity: 1; }
       84% { opacity: 1; }
-      100% { transform: translate(calc(-50% + var(--fall-x)), calc(-50% + var(--fall-y))) scale(.3) rotate(var(--fall-rot)); opacity: .18; }
+      100% { transform: translate(calc(-50% + var(--fall-x)), calc(-50% + var(--fall-y))) scale(.34) rotate(var(--fall-rot)); opacity: 1; }
     }
-    .flower { --lift: 0px; position: absolute; z-index: 13; width: 46px; height: 46px; border: 0; background: transparent; transform: translate(-50%, calc(-50% - var(--lift))); cursor: grab; transition: transform .25s ease, opacity .3s ease; touch-action: none; -webkit-tap-highlight-color: transparent; }
-    .flower::before { content: "🌸"; font-size: 38px; filter: drop-shadow(0 5px 4px #0005); }
-    .flower:nth-of-type(3n)::before { content: "🌼"; }
-    .flower:nth-of-type(4n)::before { content: "🌺"; }
+    .flower { --lift: 0px; --stem-h: 112px; --lean: 0deg; --flip: 1; --light: 1; position: absolute; z-index: 13; bottom: 1.5%; width: 58px; height: var(--stem-h); padding: 0; border: 0; background: transparent; transform: translate(-50%, calc(0px - var(--lift))); transform-origin: 50% 100%; cursor: grab; transition: transform .25s ease, opacity .3s ease; touch-action: none; -webkit-tap-highlight-color: transparent; }
+    .flower-plant { width: 100%; height: 100%; object-fit: fill; pointer-events: none; transform: scaleX(var(--flip)) rotate(var(--lean)); transform-origin: 50% 100%; filter: brightness(var(--light)) drop-shadow(0 4px 3px #0005); }
     .flower.dragging { cursor: grabbing; transition: none; }
-    .flower.picked { transform: translate(-50%, -240%) scale(.5) rotate(25deg); opacity: 0; pointer-events: none; }
+    .flower.picked { z-index: 43; pointer-events: none; animation: flower-to-basket .72s cubic-bezier(.36,.04,.72,.52) forwards; }
+    .flower.stored { visibility: hidden; animation: none; }
+    @keyframes flower-to-basket {
+      0% { transform: translate(-50%, calc(0px - var(--lift))) scale(1) rotate(0deg); opacity: 1; }
+      20% { transform: translate(-50%, calc(-18px - var(--lift))) scale(.96) rotate(-8deg); opacity: 1; }
+      100% { transform: translate(calc(-50% + var(--flower-fall-x)), calc(0px - var(--lift) + var(--flower-fall-y))) scale(.4) rotate(var(--flower-fall-rot)); opacity: 1; }
+    }
     .hint { position: absolute; z-index: 50; left: 50%; top: max(154px, calc(env(safe-area-inset-top) + 140px)); transform: translateX(-50%); white-space: nowrap; color: white; background: #1721179f; border-color: #ffffff42; padding: 9px 14px; border-radius: 999px; font-size: 13px; font-weight: 750; pointer-events: none; }
     .basket { position: absolute; z-index: 50; left: 14px; top: max(82px, calc(env(safe-area-inset-top) + 68px)); width: 128px; border-radius: 17px; padding: 7px 8px 12px; pointer-events: none; }
     .basket-row { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; }
@@ -46,6 +51,18 @@
     .reset { margin-left: auto; display: grid; place-items: center; width: 29px; height: 29px; padding: 0; border: 1.5px solid #57904d; border-radius: 50%; color: #387231; background: transparent; font-size: 17px; font-weight: 800; pointer-events: auto; }
     .progress { position: absolute; left: 10px; right: 10px; bottom: 6px; height: 4px; border-radius: 9px; background: #d5d8cd; overflow: hidden; }
     .progress > i { display: block; height: 100%; width: 0; background: #c9241c; transition: width .35s ease; }
+    .collection-basket { position: absolute; z-index: 20; bottom: 1.7%; pointer-events: none; }
+    .fruit-basket { left: 48%; width: 25%; height: 16%; }
+    .flower-basket { right: 2.5%; width: 25%; height: 13.5%; }
+    .basket-label { position: absolute; z-index: 4; left: 50%; bottom: 4px; transform: translateX(-50%); padding: 3px 8px; border-radius: 999px; color: #fff9dc; background: #523216cc; border: 1px solid #e9c98b99; box-shadow: 0 2px 7px #0005; font-size: 10px; font-weight: 800; white-space: nowrap; }
+    .flower-wicker { position: absolute; z-index: 1; left: 4%; right: 4%; bottom: 0; height: 54%; border: 3px solid #6a3c18; border-radius: 10px 10px 28px 28px; background: repeating-linear-gradient(3deg, #8d541f 0 5px, #bd7a38 5px 9px, #724016 9px 12px); box-shadow: inset 0 6px 8px #e5aa5b77, 0 8px 13px #17240d77; }
+    .flower-wicker::before { content: ""; position: absolute; left: 14%; right: 14%; bottom: 54%; height: 72%; border: 6px solid #6b3e1b; border-bottom: 0; border-radius: 999px 999px 0 0; box-shadow: inset 2px 0 #c18746, 2px 0 #3a210e; }
+    .basket-fill { position: absolute; z-index: 3; left: 10%; right: 10%; bottom: 28%; height: 52%; display: flex; align-items: flex-end; justify-content: center; align-content: flex-end; flex-wrap: wrap-reverse; gap: 0; overflow: hidden; }
+    .fruit-basket .basket-fill { left: 8%; right: 8%; bottom: 21%; height: 44%; }
+    .fruit-token { width: 28%; max-width: 34px; margin: -4px -2px 0; filter: drop-shadow(0 2px 2px #0006); }
+    .flower-token { width: 24%; max-width: 28px; height: 44px; object-fit: fill; margin: -7px -3px 0; filter: drop-shadow(0 2px 2px #0005); }
+    .landing-pop { animation: landing-pop .28s ease-out; }
+    @keyframes landing-pop { 0% { transform: translateY(-12px) scale(.7); } 65% { transform: translateY(2px) scale(1.12); } 100% { transform: none; } }
     @media (min-aspect-ratio: 1/1) {
       .shell { border-radius: 28px; height: 94vh; margin-top: 3vh; }
     }
@@ -66,14 +83,20 @@
     <button class="apple" style="left:67%;top:52%;--s:.78"><img src="apple.png" alt="苹果"></button>
     <button class="apple" style="left:29%;top:59%;--s:.79"><img src="apple.png" alt="苹果"></button>
     <button class="apple" style="left:80%;top:60%;--s:.92"><img src="apple.png" alt="苹果"></button>
-    <button class="flower" style="left:10%;top:71%" aria-label="摘花"></button>
-    <button class="flower" style="left:20%;top:76%" aria-label="摘花"></button>
-    <button class="flower" style="left:31%;top:72%" aria-label="摘花"></button>
-    <button class="flower" style="left:41%;top:78%" aria-label="摘花"></button>
-    <button class="flower" style="left:61%;top:77%" aria-label="摘花"></button>
-    <button class="flower" style="left:70%;top:72%" aria-label="摘花"></button>
-    <button class="flower" style="left:81%;top:76%" aria-label="摘花"></button>
-    <button class="flower" style="left:91%;top:70%" aria-label="摘花"></button>
+    <button class="flower" style="left:8%;--stem-h:132px;--lean:-3deg;--light:1.05" aria-label="摘真实小花"><img class="flower-plant" src="flower-real-crop.png" alt=""></button>
+    <button class="flower" style="left:18%;--stem-h:94px;--flip:-1;--lean:4deg;--light:.96" aria-label="摘真实小花"><img class="flower-plant" src="flower-real-crop.png" alt=""></button>
+    <button class="flower" style="left:29%;--stem-h:122px;--lean:2deg;--light:1.02" aria-label="摘真实小花"><img class="flower-plant" src="flower-real-crop.png" alt=""></button>
+    <button class="flower" style="left:40%;--stem-h:84px;--flip:-1;--lean:-4deg;--light:.94" aria-label="摘真实小花"><img class="flower-plant" src="flower-real-crop.png" alt=""></button>
+    <button class="flower" style="left:60%;--stem-h:91px;--lean:3deg;--light:1.04" aria-label="摘真实小花"><img class="flower-plant" src="flower-real-crop.png" alt=""></button>
+    <button class="flower" style="left:70%;--stem-h:126px;--flip:-1;--lean:1deg;--light:.98" aria-label="摘真实小花"><img class="flower-plant" src="flower-real-crop.png" alt=""></button>
+    <button class="flower" style="left:81%;--stem-h:99px;--lean:-2deg;--light:1.06" aria-label="摘真实小花"><img class="flower-plant" src="flower-real-crop.png" alt=""></button>
+    <button class="flower" style="left:92%;--stem-h:137px;--flip:-1;--lean:4deg;--light:.95" aria-label="摘真实小花"><img class="flower-plant" src="flower-real-crop.png" alt=""></button>
+    <div class="collection-basket fruit-basket" aria-label="苹果篮">
+      <div class="basket-fill" id="fruit-fill"></div><span class="basket-label">苹果篮</span>
+    </div>
+    <div class="collection-basket flower-basket" aria-label="鲜花篮">
+      <div class="basket-fill" id="flower-fill"></div><div class="flower-wicker"></div><span class="basket-label">鲜花篮</span>
+    </div>
     <div class="hint">☝️ 按住苹果左右拧，再向下拉</div>
     <div class="basket"><div class="basket-row"><span class="totals"><span>🍎 <b id="count">0</b> / 12</span><span>🌸 <b id="flower-count">0</b> / 8</span></span><button class="reset" type="button" aria-label="重新长满">↻</button></div><div class="progress"><i id="bar"></i></div></div>
   </main>
@@ -168,14 +191,30 @@
       hint.style.display = 'block';
     }
 
+    function storeApple() {
+      const token = document.createElement('img');
+      token.src = 'apple.png';
+      token.alt = '';
+      token.className = 'fruit-token landing-pop';
+      document.querySelector('#fruit-fill').append(token);
+    }
+
+    function storeFlower(flower) {
+      const token = document.createElement('img');
+      token.className = 'flower-token landing-pop';
+      token.src = 'flower-real-crop.png';
+      token.alt = '';
+      document.querySelector('#flower-fill').append(token);
+    }
+
     function landApple(apple) {
       if (apple.classList.contains('picked')) return;
-      const shell = document.querySelector('.shell').getBoundingClientRect();
       const fruit = apple.getBoundingClientRect();
       const currentX = Number.parseFloat(apple.style.getPropertyValue('--dx')) || 0;
       const currentY = Number.parseFloat(apple.style.getPropertyValue('--dy')) || 0;
-      const basketX = shell.left + shell.width * .56;
-      const basketY = shell.top + shell.height * .91;
+      const target = document.querySelector('.fruit-basket').getBoundingClientRect();
+      const basketX = target.left + target.width * (.36 + Math.random() * .28);
+      const basketY = target.top + target.height * (.48 + Math.random() * .14);
       apple.style.setProperty('--fall-x', `${currentX + basketX - (fruit.left + fruit.width / 2)}px`);
       apple.style.setProperty('--fall-y', `${currentY + basketY - (fruit.top + fruit.height / 2)}px`);
       apple.style.setProperty('--fall-rot', `${105 + Math.random() * 90}deg`);
@@ -193,7 +232,9 @@
         navigator.vibrate?.(28);
         picked += 1;
         updateProgress();
-      }, 780);
+        apple.classList.add('stored');
+        storeApple();
+      }, 820);
     }
 
     apples.forEach(apple => {
@@ -271,14 +312,30 @@
 
     function pickFlower(flower) {
       if (flower.classList.contains('picked')) return;
+      const blossom = flower.querySelector('.flower-plant').getBoundingClientRect();
+      const target = document.querySelector('.flower-basket').getBoundingClientRect();
+      const basketX = target.left + target.width * (.36 + Math.random() * .28);
+      const basketY = target.top + target.height * (.48 + Math.random() * .12);
+      flower.style.setProperty('--flower-fall-x', `${basketX - (blossom.left + blossom.width / 2)}px`);
+      flower.style.setProperty('--flower-fall-y', `${basketY - (blossom.top + blossom.height / 2)}px`);
+      flower.style.setProperty('--flower-fall-rot', `${55 + Math.random() * 75}deg`);
       flower.classList.remove('dragging');
       flower.classList.add('picked');
       activeFlower = null;
       playFlowerSound();
       navigator.vibrate?.(20);
-      flowersPicked += 1;
-      updateProgress();
       document.querySelector('.hint').style.display = 'none';
+
+      const expectedGeneration = generation;
+      window.setTimeout(() => {
+        if (generation !== expectedGeneration || !flower.classList.contains('picked')) return;
+        flower.classList.add('stored');
+        storeFlower(flower);
+        playBasketLanding();
+        navigator.vibrate?.(24);
+        flowersPicked += 1;
+        updateProgress();
+      }, 720);
     }
 
     flowers.forEach(flower => {
@@ -317,7 +374,7 @@
       activeApple = null;
       activeFlower = null;
       apples.forEach(apple => {
-        apple.classList.remove('picked', 'dragging', 'tease');
+        apple.classList.remove('picked', 'stored', 'dragging', 'tease');
         apple.style.setProperty('--dx', '0px');
         apple.style.setProperty('--dy', '0px');
         apple.style.setProperty('--rot', '0deg');
@@ -325,9 +382,11 @@
         savedTension.delete(apple);
       });
       flowers.forEach(flower => {
-        flower.classList.remove('picked', 'dragging');
+        flower.classList.remove('picked', 'stored', 'dragging');
         flower.style.setProperty('--lift', '0px');
       });
+      document.querySelector('#fruit-fill').replaceChildren();
+      document.querySelector('#flower-fill').replaceChildren();
       updateProgress();
       playGrowthSound();
       navigator.vibrate?.(12);
