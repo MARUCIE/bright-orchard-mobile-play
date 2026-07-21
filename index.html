@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#31531f">
+  <meta property="og:title" content="明亮果园">
+  <meta property="og:description" content="慢慢摘，不着急">
+  <meta property="og:image" content="og.png">
+  <title>明亮果园 · 手机试玩</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; background: #719747; }
+    body::before { content: ""; position: fixed; inset: -30px; background: url('orchard-bg.png') center / cover; filter: blur(20px) brightness(.88); transform: scale(1.08); }
+    .shell { position: relative; width: min(100vw, 56.25vh); height: 100vh; margin: auto; overflow: hidden; background: url('orchard-bg.png') center / cover; box-shadow: 0 0 60px #18361666; }
+    .shell::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(#0002, transparent 24%, transparent 75%, #0003); }
+    .top { position: absolute; z-index: 50; top: max(14px, env(safe-area-inset-top)); left: 14px; right: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .brand, .settings, .basket, .hint { backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); background: #ffffffb8; border: 1px solid #ffffffb8; box-shadow: 0 8px 24px #12260c22; }
+    .brand { border-radius: 999px; padding: 10px 16px; line-height: 1.05; }
+    .brand strong { display: block; font-size: 20px; letter-spacing: .02em; }
+    .brand small { color: #47543f; font-weight: 650; }
+    .settings { border-radius: 50%; width: 48px; height: 48px; display: grid; place-items: center; font-size: 22px; }
+    .apple { --s: 1; position: absolute; z-index: 12; width: clamp(62px, 16vw, 105px); height: clamp(62px, 16vw, 105px); padding: 0; border: 0; background: transparent; transform: translate(-50%, -50%) scale(var(--s)); filter: drop-shadow(0 8px 8px #0006); cursor: grab; transition: transform .18s ease, opacity .45s ease; touch-action: none; }
+    .apple img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+    .apple::before { content: ""; position: absolute; z-index: -1; left: calc(50% - 3px); top: -7px; width: 7px; height: 23px; border-radius: 5px; background: linear-gradient(90deg, #4a2810, #95613a 50%, #3c210d); transform: rotate(8deg); transform-origin: bottom; }
+    .apple:active { transform: translate(-50%, -50%) scale(calc(var(--s) * .9)) rotate(10deg); }
+    .apple.picked { transform: translate(-50%, 520%) scale(.55) rotate(35deg); opacity: 0; }
+    .flower { position: absolute; z-index: 13; width: 46px; height: 46px; border: 0; background: transparent; transform: translate(-50%, -50%); cursor: pointer; transition: transform .3s ease, opacity .3s ease; }
+    .flower::before { content: "🌸"; font-size: 38px; filter: drop-shadow(0 5px 4px #0005); }
+    .flower:nth-of-type(3n)::before { content: "🌼"; }
+    .flower:nth-of-type(4n)::before { content: "🌺"; }
+    .flower.picked { transform: translate(-50%, -240%) scale(.5) rotate(25deg); opacity: 0; }
+    .hint { position: absolute; z-index: 50; left: 50%; bottom: 105px; transform: translateX(-50%); white-space: nowrap; color: white; background: #1721179f; border-color: #ffffff42; padding: 11px 18px; border-radius: 999px; font-size: 14px; font-weight: 750; }
+    .basket { position: absolute; z-index: 50; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(88%, 420px); border-radius: 22px; padding: 13px 16px; }
+    .basket-row { display: flex; align-items: center; gap: 9px; font-size: 17px; font-weight: 800; }
+    .basket-row span:first-child { font-size: 23px; }
+    .reset { margin-left: auto; padding: 7px 10px; border: 2px solid #57904d; border-radius: 999px; color: #387231; background: transparent; font-size: 12px; font-weight: 800; }
+    .progress { height: 7px; border-radius: 9px; background: #d5d8cd; margin-top: 9px; overflow: hidden; }
+    .progress > i { display: block; height: 100%; width: 0; background: #c9241c; transition: width .35s ease; }
+    @media (min-aspect-ratio: 1/1) {
+      .shell { border-radius: 28px; height: 94vh; margin-top: 3vh; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell" aria-label="明亮果园手机与iPad视觉验收">
+    <div class="top"><div class="brand"><strong>明亮果园</strong><small>慢慢摘，不着急</small></div><div class="settings">☷</div></div>
+    <button class="apple" style="left:19%;top:20%;--s:.82"><img src="apple.png" alt="苹果"></button>
+    <button class="apple" style="left:39%;top:15%;--s:.72"><img src="apple.png" alt="苹果"></button>
+    <button class="apple" style="left:63%;top:17%;--s:.88"><img src="apple.png" alt="苹果"></button>
+    <button class="apple" style="left:82%;top:24%;--s:.7"><img src="apple.png" alt="苹果"></button>
+    <button class="apple" style="left:27%;top:34%;--s:.95"><img src="apple.png" alt="苹果"></button>
+    <button class="apple" style="left:52%;top:31%;--s:.76"><img src="apple.png" alt="苹果"></button>
+    <button class="apple" style="left:76%;top:38%;--s:.91"><img src="apple.png" alt="苹果"></button>
+    <button class="apple" style="left:16%;top:49%;--s:.7"><img src="apple.png" alt="苹果"></button>
+    <button class="apple" style="left:41%;top:47%;--s:1"><img src="apple.png" alt="苹果"></button>
+    <button class="apple" style="left:67%;top:52%;--s:.78"><img src="apple.png" alt="苹果"></button>
+    <button class="apple" style="left:29%;top:59%;--s:.79"><img src="apple.png" alt="苹果"></button>
+    <button class="apple" style="left:80%;top:60%;--s:.92"><img src="apple.png" alt="苹果"></button>
+    <button class="flower" style="left:10%;top:71%" aria-label="摘花"></button>
+    <button class="flower" style="left:20%;top:76%" aria-label="摘花"></button>
+    <button class="flower" style="left:31%;top:72%" aria-label="摘花"></button>
+    <button class="flower" style="left:41%;top:78%" aria-label="摘花"></button>
+    <button class="flower" style="left:61%;top:77%" aria-label="摘花"></button>
+    <button class="flower" style="left:70%;top:72%" aria-label="摘花"></button>
+    <button class="flower" style="left:81%;top:76%" aria-label="摘花"></button>
+    <button class="flower" style="left:91%;top:70%" aria-label="摘花"></button>
+    <div class="hint">☝️ 旋转摘苹果 · 轻点摘鲜花</div>
+    <div class="basket"><div class="basket-row"><span>🧺</span><span>苹果 <b id="count">0</b> / 12 · 鲜花 <b id="flower-count">0</b> / 8</span><button class="reset" type="button">重新长满</button></div><div class="progress"><i id="bar"></i></div></div>
+  </main>
+  <script>
+    let picked = 0;
+    const apples = [...document.querySelectorAll('.apple')];
+    apples.forEach(apple => apple.addEventListener('pointerup', () => {
+      if (apple.classList.contains('picked')) return;
+      apple.classList.add('picked');
+      navigator.vibrate?.([18, 25, 35]);
+      picked += 1;
+      document.querySelector('#count').textContent = picked;
+      document.querySelector('#bar').style.width = `${picked / apples.length * 100}%`;
+      document.querySelector('.hint').style.display = 'none';
+    }));
+    let flowersPicked = 0;
+    document.querySelectorAll('.flower').forEach(flower => flower.addEventListener('pointerup', () => {
+      if (flower.classList.contains('picked')) return;
+      flower.classList.add('picked');
+      navigator.vibrate?.(20);
+      flowersPicked += 1;
+      document.querySelector('#flower-count').textContent = flowersPicked;
+      document.querySelector('.hint').style.display = 'none';
+    }));
+    document.querySelector('.reset').addEventListener('pointerup', () => {
+      picked = 0;
+      flowersPicked = 0;
+      apples.forEach(apple => apple.classList.remove('picked'));
+      document.querySelectorAll('.flower').forEach(flower => flower.classList.remove('picked'));
+      document.querySelector('#count').textContent = '0';
+      document.querySelector('#flower-count').textContent = '0';
+      document.querySelector('#bar').style.width = '0';
+      navigator.vibrate?.(12);
+    });
+  </script>
+</body>
+</html>
