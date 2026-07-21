@@ -20,22 +20,31 @@
     .brand strong { display: block; font-size: 20px; letter-spacing: .02em; }
     .brand small { color: #47543f; font-weight: 650; }
     .sound { border-radius: 50%; width: 48px; height: 48px; display: grid; place-items: center; padding: 0; color: #1d3216; font-size: 22px; cursor: pointer; }
-    .apple { --s: 1; position: absolute; z-index: 12; width: clamp(62px, 16vw, 105px); height: clamp(62px, 16vw, 105px); padding: 0; border: 0; background: transparent; transform: translate(-50%, -50%) scale(var(--s)); filter: drop-shadow(0 8px 8px #0006); cursor: grab; transition: transform .18s ease, opacity .45s ease; touch-action: none; }
+    .apple { --s: 1; --dx: 0px; --dy: 0px; --rot: 0deg; --twig-scale: 1; position: absolute; z-index: 12; width: clamp(62px, 16vw, 105px); height: clamp(62px, 16vw, 105px); padding: 0; border: 0; background: transparent; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(var(--s)) rotate(var(--rot)); transform-origin: 50% -8%; filter: drop-shadow(0 8px 8px #0006); cursor: grab; transition: transform .26s cubic-bezier(.2,.8,.2,1), opacity .45s ease; touch-action: none; -webkit-tap-highlight-color: transparent; }
     .apple img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
-    .apple::before { content: ""; position: absolute; z-index: -1; left: calc(50% - 3px); top: -7px; width: 7px; height: 23px; border-radius: 5px; background: linear-gradient(90deg, #4a2810, #95613a 50%, #3c210d); transform: rotate(8deg); transform-origin: bottom; }
-    .apple:active { transform: translate(-50%, -50%) scale(calc(var(--s) * .9)) rotate(10deg); }
-    .apple.picked { transform: translate(-50%, 520%) scale(.55) rotate(35deg); opacity: 0; }
-    .flower { position: absolute; z-index: 13; width: 46px; height: 46px; border: 0; background: transparent; transform: translate(-50%, -50%); cursor: pointer; transition: transform .3s ease, opacity .3s ease; }
+    .apple::before { content: ""; position: absolute; z-index: -1; left: calc(50% - 3px); top: -7px; width: 7px; height: 23px; border-radius: 5px; background: linear-gradient(90deg, #4a2810, #95613a 50%, #3c210d); transform: rotate(8deg) scaleY(var(--twig-scale)); transform-origin: top; }
+    .apple.dragging { z-index: 18; cursor: grabbing; transition: none; filter: drop-shadow(0 11px 8px #0007) saturate(1.08); }
+    .apple.tease { animation: apple-tease .35s ease; }
+    .apple.picked { pointer-events: none; animation: apple-to-basket .78s cubic-bezier(.48,.05,.78,.48) forwards; }
+    @keyframes apple-tease { 30% { rotate: -7deg; } 65% { rotate: 8deg; } }
+    @keyframes apple-to-basket {
+      0% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(var(--s)) rotate(var(--rot)); opacity: 1; }
+      18% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) - 18px)) scale(calc(var(--s) * .97)) rotate(18deg); opacity: 1; }
+      84% { opacity: 1; }
+      100% { transform: translate(calc(-50% + var(--fall-x)), calc(-50% + var(--fall-y))) scale(.3) rotate(var(--fall-rot)); opacity: .18; }
+    }
+    .flower { --lift: 0px; position: absolute; z-index: 13; width: 46px; height: 46px; border: 0; background: transparent; transform: translate(-50%, calc(-50% - var(--lift))); cursor: grab; transition: transform .25s ease, opacity .3s ease; touch-action: none; -webkit-tap-highlight-color: transparent; }
     .flower::before { content: "🌸"; font-size: 38px; filter: drop-shadow(0 5px 4px #0005); }
     .flower:nth-of-type(3n)::before { content: "🌼"; }
     .flower:nth-of-type(4n)::before { content: "🌺"; }
-    .flower.picked { transform: translate(-50%, -240%) scale(.5) rotate(25deg); opacity: 0; }
-    .hint { position: absolute; z-index: 50; left: 50%; bottom: 105px; transform: translateX(-50%); white-space: nowrap; color: white; background: #1721179f; border-color: #ffffff42; padding: 11px 18px; border-radius: 999px; font-size: 14px; font-weight: 750; }
-    .basket { position: absolute; z-index: 50; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(88%, 420px); border-radius: 22px; padding: 13px 16px; }
-    .basket-row { display: flex; align-items: center; gap: 9px; font-size: 17px; font-weight: 800; }
-    .basket-row span:first-child { font-size: 23px; }
-    .reset { margin-left: auto; padding: 7px 10px; border: 2px solid #57904d; border-radius: 999px; color: #387231; background: transparent; font-size: 12px; font-weight: 800; }
-    .progress { height: 7px; border-radius: 9px; background: #d5d8cd; margin-top: 9px; overflow: hidden; }
+    .flower.dragging { cursor: grabbing; transition: none; }
+    .flower.picked { transform: translate(-50%, -240%) scale(.5) rotate(25deg); opacity: 0; pointer-events: none; }
+    .hint { position: absolute; z-index: 50; left: 50%; top: max(154px, calc(env(safe-area-inset-top) + 140px)); transform: translateX(-50%); white-space: nowrap; color: white; background: #1721179f; border-color: #ffffff42; padding: 9px 14px; border-radius: 999px; font-size: 13px; font-weight: 750; pointer-events: none; }
+    .basket { position: absolute; z-index: 50; left: 14px; top: max(82px, calc(env(safe-area-inset-top) + 68px)); width: 128px; border-radius: 17px; padding: 7px 8px 12px; pointer-events: none; }
+    .basket-row { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; }
+    .totals { display: grid; gap: 1px; line-height: 1.1; }
+    .reset { margin-left: auto; display: grid; place-items: center; width: 29px; height: 29px; padding: 0; border: 1.5px solid #57904d; border-radius: 50%; color: #387231; background: transparent; font-size: 17px; font-weight: 800; pointer-events: auto; }
+    .progress { position: absolute; left: 10px; right: 10px; bottom: 6px; height: 4px; border-radius: 9px; background: #d5d8cd; overflow: hidden; }
     .progress > i { display: block; height: 100%; width: 0; background: #c9241c; transition: width .35s ease; }
     @media (min-aspect-ratio: 1/1) {
       .shell { border-radius: 28px; height: 94vh; margin-top: 3vh; }
@@ -65,8 +74,8 @@
     <button class="flower" style="left:70%;top:72%" aria-label="摘花"></button>
     <button class="flower" style="left:81%;top:76%" aria-label="摘花"></button>
     <button class="flower" style="left:91%;top:70%" aria-label="摘花"></button>
-    <div class="hint">☝️ 旋转摘苹果 · 轻点摘鲜花</div>
-    <div class="basket"><div class="basket-row"><span>🧺</span><span>苹果 <b id="count">0</b> / 12 · 鲜花 <b id="flower-count">0</b> / 8</span><button class="reset" type="button">重新长满</button></div><div class="progress"><i id="bar"></i></div></div>
+    <div class="hint">☝️ 按住苹果左右拧，再向下拉</div>
+    <div class="basket"><div class="basket-row"><span class="totals"><span>🍎 <b id="count">0</b> / 12</span><span>🌸 <b id="flower-count">0</b> / 8</span></span><button class="reset" type="button" aria-label="重新长满">↻</button></div><div class="progress"><i id="bar"></i></div></div>
   </main>
   <script>
     let audioContext;
@@ -117,10 +126,14 @@
       source.start(context.currentTime + delay);
     }
 
-    function playAppleSound() {
+    function playStemBreak() {
       tone(620, .055, 0, .055, 'triangle');
       softNoise(.025, .08, .032);
-      tone(145, .13, .14, .045, 'sine');
+    }
+
+    function playBasketLanding() {
+      tone(145, .14, 0, .052, 'sine');
+      softNoise(.015, .1, .02);
     }
 
     function playFlowerSound() {
@@ -134,41 +147,194 @@
       tone(659, .2, .16, .03, 'sine');
     }
 
+    let generation = 0;
     let picked = 0;
-    const apples = [...document.querySelectorAll('.apple')];
-    apples.forEach(apple => apple.addEventListener('pointerup', () => {
-      if (apple.classList.contains('picked')) return;
-      apple.classList.add('picked');
-      playAppleSound();
-      navigator.vibrate?.([18, 25, 35]);
-      picked += 1;
-      document.querySelector('#count').textContent = picked;
-      document.querySelector('#bar').style.width = `${picked / apples.length * 100}%`;
-      document.querySelector('.hint').style.display = 'none';
-    }));
     let flowersPicked = 0;
-    document.querySelectorAll('.flower').forEach(flower => flower.addEventListener('pointerup', () => {
+    let activeApple = null;
+    let activeFlower = null;
+    const apples = [...document.querySelectorAll('.apple')];
+    const flowers = [...document.querySelectorAll('.flower')];
+    const savedTension = new WeakMap();
+
+    function updateProgress() {
+      document.querySelector('#count').textContent = picked;
+      document.querySelector('#flower-count').textContent = flowersPicked;
+      document.querySelector('#bar').style.width = `${(picked + flowersPicked) / (apples.length + flowers.length) * 100}%`;
+    }
+
+    function showHint(message) {
+      const hint = document.querySelector('.hint');
+      hint.textContent = message;
+      hint.style.display = 'block';
+    }
+
+    function landApple(apple) {
+      if (apple.classList.contains('picked')) return;
+      const shell = document.querySelector('.shell').getBoundingClientRect();
+      const fruit = apple.getBoundingClientRect();
+      const currentX = Number.parseFloat(apple.style.getPropertyValue('--dx')) || 0;
+      const currentY = Number.parseFloat(apple.style.getPropertyValue('--dy')) || 0;
+      const basketX = shell.left + shell.width * .56;
+      const basketY = shell.top + shell.height * .91;
+      apple.style.setProperty('--fall-x', `${currentX + basketX - (fruit.left + fruit.width / 2)}px`);
+      apple.style.setProperty('--fall-y', `${currentY + basketY - (fruit.top + fruit.height / 2)}px`);
+      apple.style.setProperty('--fall-rot', `${105 + Math.random() * 90}deg`);
+      apple.classList.remove('dragging', 'tease');
+      apple.classList.add('picked');
+      activeApple = null;
+      playStemBreak();
+      navigator.vibrate?.([20, 22, 34]);
+      document.querySelector('.hint').style.display = 'none';
+
+      const expectedGeneration = generation;
+      window.setTimeout(() => {
+        if (generation !== expectedGeneration || !apple.classList.contains('picked')) return;
+        playBasketLanding();
+        navigator.vibrate?.(28);
+        picked += 1;
+        updateProgress();
+      }, 780);
+    }
+
+    apples.forEach(apple => {
+      apple.addEventListener('pointerdown', event => {
+        if (apple.classList.contains('picked')) return;
+        if (activeApple || activeFlower) return;
+        getAudioContext();
+        apple.setPointerCapture(event.pointerId);
+        activeApple = {
+          apple,
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          lastX: event.clientX,
+          travel: 0,
+          pull: 0,
+          effort: savedTension.get(apple) || 0,
+          pulse: 0
+        };
+        apple.classList.remove('tease');
+        apple.classList.add('dragging');
+      });
+
+      apple.addEventListener('pointermove', event => {
+        if (!activeApple || activeApple.apple !== apple || activeApple.pointerId !== event.pointerId) return;
+        const movementX = event.clientX - activeApple.lastX;
+        const displacementX = event.clientX - activeApple.startX;
+        const displacementY = Math.max(0, event.clientY - activeApple.startY);
+        const addedPull = Math.max(0, displacementY - activeApple.pull);
+        activeApple.lastX = event.clientX;
+        activeApple.travel += Math.abs(movementX);
+        activeApple.pull = Math.max(activeApple.pull, displacementY);
+        activeApple.effort = Math.min(
+          1,
+          activeApple.effort + Math.abs(movementX) / 145 + addedPull / 95 * .55
+        );
+
+        apple.style.setProperty('--dx', `${Math.max(-18, Math.min(18, displacementX * .2))}px`);
+        apple.style.setProperty('--dy', `${Math.min(30, displacementY * .28)}px`);
+        apple.style.setProperty('--rot', `${Math.max(-22, Math.min(22, displacementX * .48))}deg`);
+        apple.style.setProperty('--twig-scale', String(1 + activeApple.effort * .48));
+
+        const pulse = activeApple.effort > .72 ? 2 : activeApple.effort > .4 ? 1 : 0;
+        if (pulse > activeApple.pulse) {
+          activeApple.pulse = pulse;
+          navigator.vibrate?.(pulse === 1 ? 12 : 20);
+          tone(pulse === 1 ? 280 : 360, .045, 0, .018, 'triangle');
+        }
+        if (activeApple.effort >= 1) landApple(apple);
+      });
+
+      const release = event => {
+        if (!activeApple || activeApple.apple !== apple || activeApple.pointerId !== event.pointerId) return;
+        const wasTap = activeApple.travel < 7 && activeApple.pull < 7;
+        savedTension.set(apple, activeApple.effort * .62);
+        activeApple = null;
+        apple.classList.remove('dragging');
+        apple.style.setProperty('--dx', '0px');
+        apple.style.setProperty('--dy', '0px');
+        apple.style.setProperty('--rot', '0deg');
+        apple.style.setProperty('--twig-scale', '1');
+        if (wasTap) {
+          apple.classList.add('tease');
+          window.setTimeout(() => apple.classList.remove('tease'), 360);
+          showHint('按住它，左右拧一拧，再向下拉');
+          tone(230, .07, 0, .015, 'sine');
+        }
+      };
+      apple.addEventListener('pointerup', release);
+      apple.addEventListener('pointercancel', release);
+      apple.addEventListener('click', event => {
+        if (event.detail === 0) landApple(apple);
+      });
+    });
+
+    function pickFlower(flower) {
       if (flower.classList.contains('picked')) return;
+      flower.classList.remove('dragging');
       flower.classList.add('picked');
+      activeFlower = null;
       playFlowerSound();
       navigator.vibrate?.(20);
       flowersPicked += 1;
-      document.querySelector('#flower-count').textContent = flowersPicked;
+      updateProgress();
       document.querySelector('.hint').style.display = 'none';
-    }));
-    document.querySelector('.reset').addEventListener('pointerup', () => {
+    }
+
+    flowers.forEach(flower => {
+      flower.addEventListener('pointerdown', event => {
+        if (flower.classList.contains('picked')) return;
+        if (activeApple || activeFlower) return;
+        getAudioContext();
+        flower.setPointerCapture(event.pointerId);
+        activeFlower = { flower, pointerId: event.pointerId, startY: event.clientY, lift: 0 };
+        flower.classList.add('dragging');
+      });
+      flower.addEventListener('pointermove', event => {
+        if (!activeFlower || activeFlower.flower !== flower || activeFlower.pointerId !== event.pointerId) return;
+        activeFlower.lift = Math.max(0, activeFlower.startY - event.clientY);
+        flower.style.setProperty('--lift', `${Math.min(38, activeFlower.lift)}px`);
+        if (activeFlower.lift >= 34) pickFlower(flower);
+      });
+      const releaseFlower = event => {
+        if (!activeFlower || activeFlower.flower !== flower || activeFlower.pointerId !== event.pointerId) return;
+        const wasTap = activeFlower.lift < 5;
+        activeFlower = null;
+        flower.classList.remove('dragging');
+        flower.style.setProperty('--lift', '0px');
+        if (wasTap) showHint('按住鲜花，轻轻向上提起');
+      };
+      flower.addEventListener('pointerup', releaseFlower);
+      flower.addEventListener('pointercancel', releaseFlower);
+      flower.addEventListener('click', event => {
+        if (event.detail === 0) pickFlower(flower);
+      });
+    });
+    document.querySelector('.reset').addEventListener('click', () => {
+      generation += 1;
       picked = 0;
       flowersPicked = 0;
-      apples.forEach(apple => apple.classList.remove('picked'));
-      document.querySelectorAll('.flower').forEach(flower => flower.classList.remove('picked'));
-      document.querySelector('#count').textContent = '0';
-      document.querySelector('#flower-count').textContent = '0';
-      document.querySelector('#bar').style.width = '0';
+      activeApple = null;
+      activeFlower = null;
+      apples.forEach(apple => {
+        apple.classList.remove('picked', 'dragging', 'tease');
+        apple.style.setProperty('--dx', '0px');
+        apple.style.setProperty('--dy', '0px');
+        apple.style.setProperty('--rot', '0deg');
+        apple.style.setProperty('--twig-scale', '1');
+        savedTension.delete(apple);
+      });
+      flowers.forEach(flower => {
+        flower.classList.remove('picked', 'dragging');
+        flower.style.setProperty('--lift', '0px');
+      });
+      updateProgress();
       playGrowthSound();
       navigator.vibrate?.(12);
+      showHint('按住苹果左右拧，再向下拉');
     });
     const soundButton = document.querySelector('.sound');
-    soundButton.addEventListener('pointerup', () => {
+    soundButton.addEventListener('click', () => {
       soundOn = !soundOn;
       soundButton.textContent = soundOn ? '🔊' : '🔇';
       soundButton.setAttribute('aria-label', soundOn ? '关闭音效' : '打开音效');
