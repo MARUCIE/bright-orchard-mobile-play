@@ -15,11 +15,11 @@
     .shell { position: relative; width: min(100vw, 56.25vh); height: 100vh; margin: auto; overflow: hidden; background: url('orchard-bg.png') center / cover; box-shadow: 0 0 60px #18361666; }
     .shell::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(#0002, transparent 24%, transparent 75%, #0003); }
     .top { position: absolute; z-index: 50; top: max(14px, env(safe-area-inset-top)); left: 14px; right: 14px; display: flex; justify-content: space-between; align-items: center; }
-    .brand, .settings, .basket, .hint { backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); background: #ffffffb8; border: 1px solid #ffffffb8; box-shadow: 0 8px 24px #12260c22; }
+    .brand, .sound, .basket, .hint { backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); background: #ffffffb8; border: 1px solid #ffffffb8; box-shadow: 0 8px 24px #12260c22; }
     .brand { border-radius: 999px; padding: 10px 16px; line-height: 1.05; }
     .brand strong { display: block; font-size: 20px; letter-spacing: .02em; }
     .brand small { color: #47543f; font-weight: 650; }
-    .settings { border-radius: 50%; width: 48px; height: 48px; display: grid; place-items: center; font-size: 22px; }
+    .sound { border-radius: 50%; width: 48px; height: 48px; display: grid; place-items: center; padding: 0; color: #1d3216; font-size: 22px; cursor: pointer; }
     .apple { --s: 1; position: absolute; z-index: 12; width: clamp(62px, 16vw, 105px); height: clamp(62px, 16vw, 105px); padding: 0; border: 0; background: transparent; transform: translate(-50%, -50%) scale(var(--s)); filter: drop-shadow(0 8px 8px #0006); cursor: grab; transition: transform .18s ease, opacity .45s ease; touch-action: none; }
     .apple img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
     .apple::before { content: ""; position: absolute; z-index: -1; left: calc(50% - 3px); top: -7px; width: 7px; height: 23px; border-radius: 5px; background: linear-gradient(90deg, #4a2810, #95613a 50%, #3c210d); transform: rotate(8deg); transform-origin: bottom; }
@@ -44,7 +44,7 @@
 </head>
 <body>
   <main class="shell" aria-label="明亮果园手机与iPad视觉验收">
-    <div class="top"><div class="brand"><strong>明亮果园</strong><small>慢慢摘，不着急</small></div><div class="settings">☷</div></div>
+    <div class="top"><div class="brand"><strong>明亮果园</strong><small>慢慢摘，不着急</small></div><button class="sound" type="button" aria-label="关闭音效" aria-pressed="true">🔊</button></div>
     <button class="apple" style="left:19%;top:20%;--s:.82"><img src="apple.png" alt="苹果"></button>
     <button class="apple" style="left:39%;top:15%;--s:.72"><img src="apple.png" alt="苹果"></button>
     <button class="apple" style="left:63%;top:17%;--s:.88"><img src="apple.png" alt="苹果"></button>
@@ -69,11 +69,77 @@
     <div class="basket"><div class="basket-row"><span>🧺</span><span>苹果 <b id="count">0</b> / 12 · 鲜花 <b id="flower-count">0</b> / 8</span><button class="reset" type="button">重新长满</button></div><div class="progress"><i id="bar"></i></div></div>
   </main>
   <script>
+    let audioContext;
+    let soundOn = true;
+
+    function getAudioContext() {
+      if (!soundOn) return null;
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return null;
+      audioContext ??= new AudioContextClass();
+      if (audioContext.state === 'suspended') audioContext.resume();
+      return audioContext;
+    }
+
+    function tone(frequency, duration, delay = 0, volume = .05, type = 'sine') {
+      const context = getAudioContext();
+      if (!context) return;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const start = context.currentTime + delay;
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, start);
+      gain.gain.setValueAtTime(.0001, start);
+      gain.gain.exponentialRampToValueAtTime(volume, start + .008);
+      gain.gain.exponentialRampToValueAtTime(.0001, start + duration);
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.start(start);
+      oscillator.stop(start + duration + .02);
+    }
+
+    function softNoise(delay = 0, duration = .07, volume = .025) {
+      const context = getAudioContext();
+      if (!context) return;
+      const length = Math.ceil(context.sampleRate * duration);
+      const buffer = context.createBuffer(1, length, context.sampleRate);
+      const samples = buffer.getChannelData(0);
+      for (let index = 0; index < length; index += 1) {
+        samples[index] = (Math.random() * 2 - 1) * (1 - index / length);
+      }
+      const source = context.createBufferSource();
+      const filter = context.createBiquadFilter();
+      const gain = context.createGain();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1150;
+      gain.gain.value = volume;
+      source.buffer = buffer;
+      source.connect(filter).connect(gain).connect(context.destination);
+      source.start(context.currentTime + delay);
+    }
+
+    function playAppleSound() {
+      tone(620, .055, 0, .055, 'triangle');
+      softNoise(.025, .08, .032);
+      tone(145, .13, .14, .045, 'sine');
+    }
+
+    function playFlowerSound() {
+      tone(740, .16, 0, .035, 'sine');
+      tone(990, .22, .07, .025, 'sine');
+    }
+
+    function playGrowthSound() {
+      tone(392, .12, 0, .032, 'sine');
+      tone(523, .14, .08, .032, 'sine');
+      tone(659, .2, .16, .03, 'sine');
+    }
+
     let picked = 0;
     const apples = [...document.querySelectorAll('.apple')];
     apples.forEach(apple => apple.addEventListener('pointerup', () => {
       if (apple.classList.contains('picked')) return;
       apple.classList.add('picked');
+      playAppleSound();
       navigator.vibrate?.([18, 25, 35]);
       picked += 1;
       document.querySelector('#count').textContent = picked;
@@ -84,6 +150,7 @@
     document.querySelectorAll('.flower').forEach(flower => flower.addEventListener('pointerup', () => {
       if (flower.classList.contains('picked')) return;
       flower.classList.add('picked');
+      playFlowerSound();
       navigator.vibrate?.(20);
       flowersPicked += 1;
       document.querySelector('#flower-count').textContent = flowersPicked;
@@ -97,7 +164,16 @@
       document.querySelector('#count').textContent = '0';
       document.querySelector('#flower-count').textContent = '0';
       document.querySelector('#bar').style.width = '0';
+      playGrowthSound();
       navigator.vibrate?.(12);
+    });
+    const soundButton = document.querySelector('.sound');
+    soundButton.addEventListener('pointerup', () => {
+      soundOn = !soundOn;
+      soundButton.textContent = soundOn ? '🔊' : '🔇';
+      soundButton.setAttribute('aria-label', soundOn ? '关闭音效' : '打开音效');
+      soundButton.setAttribute('aria-pressed', String(soundOn));
+      if (soundOn) playFlowerSound();
     });
   </script>
 </body>
