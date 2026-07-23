@@ -11,19 +11,20 @@
   <style>
     * { box-sizing: border-box; }
     html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; background: #719747; }
-    body::before { content: ""; position: fixed; inset: -30px; background: url('orchard-bg.png') center / cover; filter: blur(20px) brightness(.88); transform: scale(1.08); }
-    .shell { position: relative; width: min(100vw, 56.25vh); height: 100vh; margin: auto; overflow: hidden; background: url('orchard-bg.png') center / cover; box-shadow: 0 0 60px #18361666; }
+    body::before { content: ""; position: fixed; inset: -30px; background: url('orchard-bg.webp') center / cover; filter: blur(14px) brightness(.88); transform: scale(1.06); }
+    .shell { position: relative; width: min(100vw, 56.25vh); height: 100vh; margin: auto; overflow: hidden; background: url('orchard-bg.webp') center / cover; box-shadow: 0 0 60px #18361666; }
     .shell::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(#0002, transparent 24%, transparent 75%, #0003); }
     .top { position: absolute; z-index: 50; top: max(14px, env(safe-area-inset-top)); left: 14px; right: 14px; display: flex; justify-content: space-between; align-items: center; }
-    .brand, .sound, .harvest-button, .hint { backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); background: #ffffffc7; border: 1px solid #ffffffcc; box-shadow: 0 8px 24px #12260c2e; }
+    .brand, .sound, .harvest-button, .hint { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: #ffffffcf; border: 1px solid #ffffffcc; box-shadow: 0 8px 24px #12260c2e; }
     .brand { border-radius: 999px; padding: 10px 16px; line-height: 1.05; }
     .brand strong { display: block; font-size: 20px; letter-spacing: .02em; }
     .brand small { color: #47543f; font-weight: 650; }
     .sound { border-radius: 50%; width: 48px; height: 48px; display: grid; place-items: center; padding: 0; color: #1d3216; font-size: 22px; cursor: pointer; }
-    .apple { --s: 1; --dx: 0px; --dy: 0px; --rot: 0deg; --twig-scale: 1; position: absolute; z-index: 12; width: clamp(62px, 16vw, 105px); height: clamp(62px, 16vw, 105px); padding: 0; border: 0; background: transparent; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(var(--s)) rotate(var(--rot)); transform-origin: 50% -8%; filter: drop-shadow(0 8px 8px #0006); cursor: grab; transition: transform .26s cubic-bezier(.2,.8,.2,1), opacity .45s ease; touch-action: none; -webkit-tap-highlight-color: transparent; }
-    .apple img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
-    .apple::before { content: ""; position: absolute; z-index: -1; left: calc(50% - 3px); top: -7px; width: 7px; height: 23px; border-radius: 5px; background: linear-gradient(90deg, #4a2810, #95613a 50%, #3c210d); transform: rotate(8deg) scaleY(var(--twig-scale)); transform-origin: top; }
-    .apple.dragging { z-index: 18; cursor: grabbing; transition: none; filter: drop-shadow(0 11px 8px #0007) saturate(1.08); }
+    .apple { --s: 1; --dx: 0px; --dy: 0px; --rot: 0deg; --twig-scale: 1; position: absolute; z-index: 12; width: clamp(62px, 16vw, 105px); height: clamp(62px, 16vw, 105px); padding: 0; border: 0; background: transparent; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(var(--s)) rotate(var(--rot)); transform-origin: 50% -8%; cursor: grab; transition: transform .26s cubic-bezier(.2,.8,.2,1), opacity .45s ease; touch-action: none; -webkit-tap-highlight-color: transparent; will-change: transform; }
+    .apple img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+    .apple::before { content: ""; position: absolute; z-index: 2; left: calc(50% - 3px); top: -7px; width: 7px; height: 23px; border-radius: 5px; background: linear-gradient(90deg, #4a2810, #95613a 50%, #3c210d); transform: rotate(8deg) scaleY(var(--twig-scale)); transform-origin: top; }
+    .apple::after { content: ""; position: absolute; z-index: 0; left: 19%; right: 19%; bottom: 8%; height: 13%; border-radius: 50%; background: radial-gradient(ellipse, #0007 0, #0003 48%, transparent 72%); transform: translateY(7px); }
+    .apple.dragging { z-index: 18; cursor: grabbing; transition: none; }
     .apple.tease { animation: apple-tease .35s ease; }
     .apple.picked { z-index: 42; pointer-events: none; animation: apple-to-basket .82s cubic-bezier(.36,.04,.72,.52) forwards; }
     .apple.stored { visibility: hidden; animation: none; }
@@ -34,8 +35,8 @@
       84% { opacity: 1; }
       100% { transform: translate(calc(-50% + var(--fall-x)), calc(-50% + var(--fall-y))) scale(.34) rotate(var(--fall-rot)); opacity: 1; }
     }
-    .flower { --lift: 0px; --stem-h: 112px; --lean: 0deg; --flip: 1; --light: 1; position: absolute; z-index: 13; bottom: 1.5%; width: 58px; height: var(--stem-h); padding: 0; border: 0; background: transparent; transform: translate(-50%, calc(0px - var(--lift))); transform-origin: 50% 100%; cursor: grab; transition: transform .25s ease, opacity .3s ease; touch-action: none; -webkit-tap-highlight-color: transparent; }
-    .flower-plant { width: 100%; height: 100%; object-fit: fill; pointer-events: none; transform: scaleX(var(--flip)) rotate(var(--lean)); transform-origin: 50% 100%; filter: brightness(var(--light)) drop-shadow(0 4px 3px #0005); }
+    .flower { --lift: 0px; --stem-h: 112px; --lean: 0deg; --flip: 1; position: absolute; z-index: 13; bottom: 1.5%; width: 58px; height: var(--stem-h); padding: 0; border: 0; background: transparent; transform: translate(-50%, calc(0px - var(--lift))); transform-origin: 50% 100%; cursor: grab; transition: transform .25s ease, opacity .3s ease; touch-action: none; -webkit-tap-highlight-color: transparent; will-change: transform; }
+    .flower-plant { width: 100%; height: 100%; object-fit: fill; pointer-events: none; transform: scaleX(var(--flip)) rotate(var(--lean)); transform-origin: 50% 100%; }
     .flower.dragging { cursor: grabbing; transition: none; }
     .flower.picked { z-index: 43; pointer-events: none; animation: flower-to-basket .72s cubic-bezier(.36,.04,.72,.52) forwards; }
     .flower.stored { visibility: hidden; animation: none; }
@@ -65,7 +66,7 @@
     .fruit-basket::after { content: ""; position: absolute; z-index: 4; left: 5%; right: 5%; bottom: 5%; height: 31%; border-radius: 7px 7px 24px 24px; background: repeating-linear-gradient(4deg, #724016dd 0 4px, #b67735e8 4px 7px, #88501de8 7px 10px); border: 2px solid #613918cc; box-shadow: inset 0 5px 6px #e6aa5a66; }
     .flower-basket .basket-fill { left: -8%; right: -3%; bottom: 17%; height: 144%; overflow: visible; }
     .flower-basket .flower-wicker { z-index: 4; }
-    .fruit-token, .flower-token { position: absolute; left: var(--pile-left); bottom: var(--pile-bottom); transform-origin: 50% 100%; transform: translateX(-50%) rotate(var(--pile-rot)) scale(var(--pile-scale)); filter: drop-shadow(0 2px 3px #0007); }
+    .fruit-token, .flower-token { position: absolute; left: var(--pile-left); bottom: var(--pile-bottom); transform-origin: 50% 100%; transform: translateX(-50%) rotate(var(--pile-rot)) scale(var(--pile-scale)); }
     .fruit-token { z-index: var(--pile-layer); width: 34px; height: auto; }
     .flower-token { z-index: var(--pile-layer); width: 34px; height: 78px; object-fit: fill; }
     .fruit-token.landing-pop, .flower-token.landing-pop { animation: pile-settle .34s cubic-bezier(.2,.9,.3,1.15); }
@@ -77,31 +78,34 @@
     @media (min-aspect-ratio: 1/1) {
       .shell { border-radius: 28px; height: 94vh; margin-top: 3vh; }
     }
+    @media (max-aspect-ratio: 3/4) {
+      body::before { display: none; }
+    }
   </style>
 </head>
 <body>
   <main class="shell" aria-label="明亮果园手机与iPad视觉验收">
     <div class="top"><div class="brand"><strong>明亮果园</strong><small>慢慢摘，不着急</small></div><button class="sound" type="button" aria-label="关闭音效" aria-pressed="true">🔊</button></div>
-    <button class="apple" style="left:19%;top:20%;--s:.82"><img src="apple.png" alt="苹果"></button>
-    <button class="apple" style="left:39%;top:15%;--s:.72"><img src="apple.png" alt="苹果"></button>
-    <button class="apple" style="left:63%;top:17%;--s:.88"><img src="apple.png" alt="苹果"></button>
-    <button class="apple" style="left:82%;top:24%;--s:.7"><img src="apple.png" alt="苹果"></button>
-    <button class="apple" style="left:27%;top:34%;--s:.95"><img src="apple.png" alt="苹果"></button>
-    <button class="apple" style="left:52%;top:31%;--s:.76"><img src="apple.png" alt="苹果"></button>
-    <button class="apple" style="left:76%;top:38%;--s:.91"><img src="apple.png" alt="苹果"></button>
-    <button class="apple" style="left:16%;top:49%;--s:.7"><img src="apple.png" alt="苹果"></button>
-    <button class="apple" style="left:41%;top:47%;--s:1"><img src="apple.png" alt="苹果"></button>
-    <button class="apple" style="left:67%;top:52%;--s:.78"><img src="apple.png" alt="苹果"></button>
-    <button class="apple" style="left:29%;top:59%;--s:.79"><img src="apple.png" alt="苹果"></button>
-    <button class="apple" style="left:80%;top:60%;--s:.92"><img src="apple.png" alt="苹果"></button>
-    <button class="flower" style="left:8%;--stem-h:132px;--lean:-3deg;--light:1.05" aria-label="摘白色波斯菊"><img class="flower-plant" src="flower-real-crop.png" alt=""></button>
-    <button class="flower" style="left:18%;--stem-h:94px;--flip:-1;--lean:4deg;--light:.96" aria-label="摘粉色波斯菊"><img class="flower-plant" src="flower-pink.png" alt=""></button>
-    <button class="flower" style="left:29%;--stem-h:122px;--lean:2deg;--light:1.02" aria-label="摘黄色金光菊"><img class="flower-plant" src="flower-yellow.png" alt=""></button>
-    <button class="flower" style="left:40%;--stem-h:84px;--flip:-1;--lean:-4deg;--light:.94" aria-label="摘红色虞美人"><img class="flower-plant" src="flower-red.png" alt=""></button>
-    <button class="flower" style="left:60%;--stem-h:91px;--lean:3deg;--light:1.04" aria-label="摘粉色波斯菊"><img class="flower-plant" src="flower-pink.png" alt=""></button>
-    <button class="flower" style="left:70%;--stem-h:126px;--flip:-1;--lean:1deg;--light:.98" aria-label="摘白色波斯菊"><img class="flower-plant" src="flower-real-crop.png" alt=""></button>
-    <button class="flower" style="left:81%;--stem-h:99px;--lean:-2deg;--light:1.06" aria-label="摘黄色金光菊"><img class="flower-plant" src="flower-yellow.png" alt=""></button>
-    <button class="flower" style="left:92%;--stem-h:137px;--flip:-1;--lean:4deg;--light:.95" aria-label="摘红色虞美人"><img class="flower-plant" src="flower-red.png" alt=""></button>
+    <button class="apple" style="left:19%;top:20%;--s:.82"><img src="apple.webp" alt="苹果"></button>
+    <button class="apple" style="left:39%;top:15%;--s:.72"><img src="apple.webp" alt="苹果"></button>
+    <button class="apple" style="left:63%;top:17%;--s:.88"><img src="apple.webp" alt="苹果"></button>
+    <button class="apple" style="left:82%;top:24%;--s:.7"><img src="apple.webp" alt="苹果"></button>
+    <button class="apple" style="left:27%;top:34%;--s:.95"><img src="apple.webp" alt="苹果"></button>
+    <button class="apple" style="left:52%;top:31%;--s:.76"><img src="apple.webp" alt="苹果"></button>
+    <button class="apple" style="left:76%;top:38%;--s:.91"><img src="apple.webp" alt="苹果"></button>
+    <button class="apple" style="left:16%;top:49%;--s:.7"><img src="apple.webp" alt="苹果"></button>
+    <button class="apple" style="left:41%;top:47%;--s:1"><img src="apple.webp" alt="苹果"></button>
+    <button class="apple" style="left:67%;top:52%;--s:.78"><img src="apple.webp" alt="苹果"></button>
+    <button class="apple" style="left:29%;top:59%;--s:.79"><img src="apple.webp" alt="苹果"></button>
+    <button class="apple" style="left:80%;top:60%;--s:.92"><img src="apple.webp" alt="苹果"></button>
+    <button class="flower" style="left:8%;--stem-h:132px;--lean:-3deg" aria-label="摘白色波斯菊"><img class="flower-plant" src="flower-white.webp" alt=""></button>
+    <button class="flower" style="left:18%;--stem-h:94px;--flip:-1;--lean:4deg" aria-label="摘粉色波斯菊"><img class="flower-plant" src="flower-pink.webp" alt=""></button>
+    <button class="flower" style="left:29%;--stem-h:122px;--lean:2deg" aria-label="摘黄色金光菊"><img class="flower-plant" src="flower-yellow.webp" alt=""></button>
+    <button class="flower" style="left:40%;--stem-h:84px;--flip:-1;--lean:-4deg" aria-label="摘红色虞美人"><img class="flower-plant" src="flower-red.webp" alt=""></button>
+    <button class="flower" style="left:60%;--stem-h:91px;--lean:3deg" aria-label="摘粉色波斯菊"><img class="flower-plant" src="flower-pink.webp" alt=""></button>
+    <button class="flower" style="left:70%;--stem-h:126px;--flip:-1;--lean:1deg" aria-label="摘白色波斯菊"><img class="flower-plant" src="flower-white.webp" alt=""></button>
+    <button class="flower" style="left:81%;--stem-h:99px;--lean:-2deg" aria-label="摘黄色金光菊"><img class="flower-plant" src="flower-yellow.webp" alt=""></button>
+    <button class="flower" style="left:92%;--stem-h:137px;--flip:-1;--lean:4deg" aria-label="摘红色虞美人"><img class="flower-plant" src="flower-red.webp" alt=""></button>
     <div class="collection-basket fruit-basket" aria-label="苹果篮">
       <div class="basket-fill" id="fruit-fill"></div><span class="basket-label">苹果篮</span>
     </div>
@@ -227,7 +231,7 @@
 
     function storeApple() {
       const token = document.createElement('img');
-      token.src = 'apple.png';
+      token.src = 'apple.webp';
       token.alt = '';
       token.className = 'fruit-token landing-pop';
       placeInPile(token, fruitPileSlots[(picked - 1) % fruitPileSlots.length], picked);
@@ -273,6 +277,44 @@
       }, 820);
     }
 
+    function recordAppleDrag(state, clientX, clientY) {
+      const movementX = clientX - state.lastX;
+      const displacementX = clientX - state.startX;
+      const displacementY = Math.max(0, clientY - state.startY);
+      const addedPull = Math.max(0, displacementY - state.pull);
+      state.lastX = clientX;
+      state.travel += Math.abs(movementX);
+      state.pull = Math.max(state.pull, displacementY);
+      state.effort = Math.min(1, state.effort + Math.abs(movementX) / 145 + addedPull / 95 * .55);
+      state.visual = {
+        dx: Math.max(-18, Math.min(18, displacementX * .2)),
+        dy: Math.min(30, displacementY * .28),
+        rotation: Math.max(-22, Math.min(22, displacementX * .48)),
+        twigScale: 1 + state.effort * .48
+      };
+
+      const pulse = state.effort > .72 ? 2 : state.effort > .4 ? 1 : 0;
+      if (pulse > state.pulse) {
+        state.pulse = pulse;
+        navigator.vibrate?.(pulse === 1 ? 12 : 20);
+        tone(pulse === 1 ? 280 : 360, .045, 0, .018, 'triangle');
+      }
+      return state.effort >= 1;
+    }
+
+    function scheduleAppleFrame(state) {
+      if (state.frameRequest) return;
+      state.frameRequest = requestAnimationFrame(() => {
+        state.frameRequest = 0;
+        if (activeApple !== state || !state.visual) return;
+        const { dx, dy, rotation, twigScale } = state.visual;
+        state.apple.style.setProperty('--dx', `${dx}px`);
+        state.apple.style.setProperty('--dy', `${dy}px`);
+        state.apple.style.setProperty('--rot', `${rotation}deg`);
+        state.apple.style.setProperty('--twig-scale', String(twigScale));
+      });
+    }
+
     apples.forEach(apple => {
       apple.addEventListener('pointerdown', event => {
         if (apple.classList.contains('picked')) return;
@@ -288,7 +330,9 @@
           travel: 0,
           pull: 0,
           effort: savedTension.get(apple) || 0,
-          pulse: 0
+          pulse: 0,
+          frameRequest: 0,
+          visual: null
         };
         apple.classList.remove('tease');
         apple.classList.add('dragging');
@@ -296,36 +340,20 @@
 
       apple.addEventListener('pointermove', event => {
         if (!activeApple || activeApple.apple !== apple || activeApple.pointerId !== event.pointerId) return;
-        const movementX = event.clientX - activeApple.lastX;
-        const displacementX = event.clientX - activeApple.startX;
-        const displacementY = Math.max(0, event.clientY - activeApple.startY);
-        const addedPull = Math.max(0, displacementY - activeApple.pull);
-        activeApple.lastX = event.clientX;
-        activeApple.travel += Math.abs(movementX);
-        activeApple.pull = Math.max(activeApple.pull, displacementY);
-        activeApple.effort = Math.min(
-          1,
-          activeApple.effort + Math.abs(movementX) / 145 + addedPull / 95 * .55
-        );
-
-        apple.style.setProperty('--dx', `${Math.max(-18, Math.min(18, displacementX * .2))}px`);
-        apple.style.setProperty('--dy', `${Math.min(30, displacementY * .28)}px`);
-        apple.style.setProperty('--rot', `${Math.max(-22, Math.min(22, displacementX * .48))}deg`);
-        apple.style.setProperty('--twig-scale', String(1 + activeApple.effort * .48));
-
-        const pulse = activeApple.effort > .72 ? 2 : activeApple.effort > .4 ? 1 : 0;
-        if (pulse > activeApple.pulse) {
-          activeApple.pulse = pulse;
-          navigator.vibrate?.(pulse === 1 ? 12 : 20);
-          tone(pulse === 1 ? 280 : 360, .045, 0, .018, 'triangle');
+        const state = activeApple;
+        if (recordAppleDrag(state, event.clientX, event.clientY)) {
+          landApple(apple);
+          return;
         }
-        if (activeApple.effort >= 1) landApple(apple);
+        scheduleAppleFrame(state);
       });
 
       const release = event => {
         if (!activeApple || activeApple.apple !== apple || activeApple.pointerId !== event.pointerId) return;
-        const wasTap = activeApple.travel < 7 && activeApple.pull < 7;
-        savedTension.set(apple, activeApple.effort * .62);
+        const state = activeApple;
+        if (state.frameRequest) cancelAnimationFrame(state.frameRequest);
+        const wasTap = state.travel < 7 && state.pull < 7;
+        savedTension.set(apple, state.effort * .62);
         activeApple = null;
         apple.classList.remove('dragging');
         apple.style.setProperty('--dx', '0px');
@@ -355,6 +383,7 @@
       flower.style.setProperty('--flower-fall-x', `${basketX - (blossom.left + blossom.width / 2)}px`);
       flower.style.setProperty('--flower-fall-y', `${basketY - (blossom.top + blossom.height / 2)}px`);
       flower.style.setProperty('--flower-fall-rot', `${55 + Math.random() * 75}deg`);
+      if (activeFlower?.frameRequest) cancelAnimationFrame(activeFlower.frameRequest);
       flower.classList.remove('dragging');
       flower.classList.add('picked');
       activeFlower = null;
@@ -380,18 +409,31 @@
         if (activeApple || activeFlower) return;
         getAudioContext();
         flower.setPointerCapture(event.pointerId);
-        activeFlower = { flower, pointerId: event.pointerId, startY: event.clientY, lift: 0 };
+        activeFlower = { flower, pointerId: event.pointerId, startY: event.clientY, lift: 0, frameRequest: 0 };
         flower.classList.add('dragging');
       });
       flower.addEventListener('pointermove', event => {
         if (!activeFlower || activeFlower.flower !== flower || activeFlower.pointerId !== event.pointerId) return;
-        activeFlower.lift = Math.max(0, activeFlower.startY - event.clientY);
-        flower.style.setProperty('--lift', `${Math.min(38, activeFlower.lift)}px`);
-        if (activeFlower.lift >= 34) pickFlower(flower);
+        const state = activeFlower;
+        state.lift = Math.max(0, state.startY - event.clientY);
+        if (state.lift >= 34) {
+          flower.style.setProperty('--lift', '34px');
+          pickFlower(flower);
+          return;
+        }
+        if (!state.frameRequest) {
+          state.frameRequest = requestAnimationFrame(() => {
+            state.frameRequest = 0;
+            if (activeFlower !== state) return;
+            flower.style.setProperty('--lift', `${Math.min(38, state.lift)}px`);
+          });
+        }
       });
       const releaseFlower = event => {
         if (!activeFlower || activeFlower.flower !== flower || activeFlower.pointerId !== event.pointerId) return;
-        const wasTap = activeFlower.lift < 5;
+        const state = activeFlower;
+        if (state.frameRequest) cancelAnimationFrame(state.frameRequest);
+        const wasTap = state.lift < 5;
         activeFlower = null;
         flower.classList.remove('dragging');
         flower.style.setProperty('--lift', '0px');
